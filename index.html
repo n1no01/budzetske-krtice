@@ -51,10 +51,17 @@
     <div id="leaderboard-modal" class="modal hidden">
         <div class="modal-content">
             <h2>Najbolji rezultati</h2>
+            
+            <!-- Preklopnik za Top 10 / Top 100 -->
+            <div class="leaderboard-tabs" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 10px;">
+                <button id="tab-10" style="padding: 6px 15px; font-size: 0.9rem; margin-top:0;">Top 10</button>
+                <button id="tab-100" class="secondary-btn" style="padding: 6px 15px; font-size: 0.9rem; margin-top:0;">Top 100</button>
+            </div>
+
             <table id="scores-table">
                 <thead>
                     <tr>
-                        <th>Igrač / Favorit</th>
+                        <th>Igrač</th>
                         <th>Bodovi</th>
                     </tr>
                 </thead>
@@ -62,7 +69,7 @@
                     <tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>
                 </tbody>
             </table>
-            <button id="close-modal-btn">Zatvori</button>
+            <button id="close-modal-btn" style="margin-top: 15px;">Zatvori</button>
         </div>
     </div>
 
