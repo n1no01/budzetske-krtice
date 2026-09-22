@@ -28,6 +28,12 @@ const gameoverTitle = document.getElementById('gameover-title');
 const gameoverReason = document.getElementById('gameover-reason');
 const holes = document.querySelectorAll('.hole');
 
+// Elementi za rang listu i modal iz tvog HTML-a
+const leaderboardBtn = document.getElementById('leaderboard-btn');
+const leaderboardModal = document.getElementById('leaderboard-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const scoresTbody = document.getElementById('scores-tbody');
+
 // Web Audio API zvuci
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -58,6 +64,16 @@ function playSound(type) {
 
 startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', resetToMenu);
+
+// Otvaranje i zatvaranje modala za rang-listu sa početnog ekrana
+leaderboardBtn.addEventListener('click', () => {
+    leaderboardModal.classList.remove('hidden');
+    fetchScores();
+});
+
+closeModalBtn.addEventListener('click', () => {
+    leaderboardModal.classList.add('hidden');
+});
 
 function startGame() {
     const radios = document.getElementsByName('chosen');
@@ -148,21 +164,52 @@ holes.forEach(hole => {
     });
 });
 
+// Funkcija za dohvatanje rezultata sa servera (za rang listu)
+async function fetchScores() {
+    scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>`;
+    try {
+        const res = await fetch('/api/get-scores');
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Nema rezultata još uvijek.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach((item, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}. ${item.player_name}</td>
+                    <td style="text-align: right;"><strong>${item.score}</strong></td>
+                </tr>
+            `;
+        });
+        scoresTbody.innerHTML = html;
+    } catch (err) {
+        scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#e74c3c;">Greška pri učitavanju.</td></tr>`;
+        console.error(err);
+    }
+}
+
 // Funkcija za slanje rezultata na serverless API rutu
-function saveScoreToServer(playerName, finalScore) {
-    fetch('/api/save-score', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-            player_name: playerName, 
-            score: finalScore 
-        }),
-    })
-    .then(res => res.json())
-    .then(data => console.log('Uspješno spremljeno u bazu:', data))
-    .catch(err => console.error('Greška pri spremanju:', err));
+async function saveScoreToServer(playerName, finalScore) {
+    try {
+        const response = await fetch('/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                player_name: playerName, 
+                score: finalScore 
+            }),
+        });
+        const data = await response.json();
+        console.log('Uspješno spremljeno u bazu:', data);
+    } catch (err) {
+        console.error('Greška pri spremanju:', err);
+    }
 }
 
 function endGame(isPenalty, message) {
@@ -185,9 +232,14 @@ function endGame(isPenalty, message) {
     gameoverReason.textContent = message;
     finalScoreDisplay.textContent = score;
 
-    // Slanje rezultata u bazu (bilježimo izabranog političara kao identifikator igrača)
-    const playerName = `Igrač (${politicians[chosenIndex].name} favorit)`;
-    saveScoreToServer(playerName, score);
+    // Pitaj igrača za ime preko ugrađenog prompta (ili automatski upiši uz favorita)
+    let playerName = prompt("Igra je završena! Unesi svoje ime za rang listu:", "Igrač (" + politicians[chosenIndex].name + ")");
+    if (!playerName || playerName.trim() === "") {
+        playerName = "Anonimni (" + politicians[chosenIndex].name + ")";
+    }
+
+    // Slanje u bazu
+    saveScoreToServer(playerName.trim(), score);
 }
 
 function resetToMenu() {
