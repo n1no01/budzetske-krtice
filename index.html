@@ -1,106 +1,264 @@
-<!DOCTYPE html>
-<html lang="hr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Udari Političara - Whack-a-Mole BiH</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+document.addEventListener('DOMContentLoaded', () => {
+    // Putanje do vaših karikatura unutar foldera images
+    const politicians = [
+        { name: "Milorad Dodik", img: "images/dodik.png" },
+        { name: "Dragan Čović", img: "images/covic.png" },
+        { name: "Bakir Izetbegović", img: "images/bakir.png" },
+        { name: "Elmedin Konaković", img: "images/konakovic.png" },
+        { name: "Nermin Nikšić", img: "images/niksic.png" }
+    ];
 
-    <!-- EKRAN ZA IZBOR -->
-    <div id="selection-screen" class="screen">
-        <h1>UDARI POLITIČARA</h1>
-        <p>Izaberi svog političara s kojim NE SMIJEŠ dobiti udarac:</p>
+    let chosenIndex = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let gameInterval;
+    let moleTimer;
+    let isPlaying = false;
+    let lastHole = null;
+
+    // Povezivanje elemenata iz tvog novog HTML-a
+    const selectionScreen = document.getElementById('selection-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const startBtn = document.getElementById('start-btn');
+    
+    // HUD elementi
+    const scoreDisplay = document.getElementById('score');
+    const timerDisplay = document.getElementById('timer');
+    const chosenNameDisplay = document.getElementById('chosen-name');
+    const holes = document.querySelectorAll('.hole');
+
+    // Modal i Rang-lista
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const leaderboardModal = document.getElementById('leaderboard-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const scoresTbody = document.getElementById('scores-tbody');
+
+    // Tvoj novi Modal za kraj igre i unos imena
+    const saveScoreModal = document.getElementById('save-score-modal');
+    const modalGameoverTitle = document.getElementById('modal-gameover-title');
+    const modalGameoverReason = document.getElementById('modal-gameover-reason');
+    const modalFinalScore = document.getElementById('modal-final-score');
+    const playerNameInput = document.getElementById('player-name-input');
+    const submitScoreBtn = document.getElementById('submit-score-btn');
+    const cancelScoreBtn = document.getElementById('cancel-score-btn');
+
+    // Web Audio API zvuci
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'hit') {
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'fail') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+    }
+
+    startBtn.addEventListener('click', startGame);
+
+    // Otvaranje i zatvaranje modala za rang-listu
+    leaderboardBtn.addEventListener('click', () => {
+        leaderboardModal.classList.remove('hidden');
+        fetchScores();
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        leaderboardModal.classList.add('hidden');
+    });
+
+    function startGame() {
+        const radios = document.getElementsByName('chosen');
+        for (let r of radios) {
+            if (r.checked) chosenIndex = parseInt(r.value);
+        }
+
+        chosenNameDisplay.textContent = politicians[chosenIndex].name;
         
-        <div class="politicians-grid">
-            <label class="politician-card">
-                <input type="radio" name="chosen" value="0" checked>
-                <img src="images/dodik.png" alt="Dodik">
-                <span>Milorad Dodik</span>
-            </label>
-            <label class="politician-card">
-                <input type="radio" name="chosen" value="1">
-                <img src="images/covic.png" alt="Čović">
-                <span>Dragan Čović</span>
-            </label>
-            <label class="politician-card">
-                <input type="radio" name="chosen" value="2">
-                <img src="images/bakir.png" alt="Bakir">
-                <span>Bakir Izetbegović</span>
-            </label>
-            <label class="politician-card">
-                <input type="radio" name="chosen" value="3">
-                <img src="images/konakovic.png" alt="Konaković">
-                <span>Elmedin Konaković</span>
-            </label>
-            <label class="politician-card">
-                <input type="radio" name="chosen" value="4">
-                <img src="images/niksic.png" alt="Nikšić">
-                <span>Nermin Nikšić</span>
-            </label>
-        </div>
+        // Prikaz ispravnih ekrana (bez puknutih referenci na stari ekran)
+        selectionScreen.classList.add('hidden');
+        saveScoreModal.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
 
-        <div class="menu-actions">
-            <button id="start-btn">ZAPOČNI IGRU</button>
-            <button id="leaderboard-btn" class="secondary-btn">RANG-LISTA</button>
-        </div>
-    </div>
+        score = 0;
+        timeLeft = 60;
+        scoreDisplay.textContent = score;
+        timerDisplay.textContent = timeLeft;
+        isPlaying = true;
 
-    <!-- MODAL ZA RANG-LISTU -->
-    <div id="leaderboard-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Najbolji rezultati</h2>
-            <table id="scores-table">
-                <thead>
+        // Pokreni tajmer
+        gameInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                endGame(false, "Vrijeme je isteklo!");
+            }
+        }, 1000);
+
+        // Pokreni iskakanje likova
+        runner();
+    }
+
+    function randomHole() {
+        const idx = Math.floor(Math.random() * holes.length);
+        const hole = holes[idx];
+        if (hole === lastHole) return randomHole();
+        lastHole = hole;
+        return hole;
+    }
+
+    function randomPolitician() {
+        return Math.floor(Math.random() * politicians.length);
+    }
+
+    function runner() {
+        if (!isPlaying) return;
+
+        const hole = randomHole();
+        const polIdx = randomPolitician();
+        const mole = hole.querySelector('.mole');
+
+        mole.src = politicians[polIdx].img;
+        mole.dataset.index = polIdx;
+
+        hole.classList.add('up');
+
+        let timeUp = Math.random() * 600 + 600; // Vrijeme vani (0.6s - 1.2s)
+        
+        moleTimer = setTimeout(() => {
+            hole.classList.remove('up');
+            if (isPlaying) {
+                setTimeout(runner, Math.random() * 400 + 200);
+            }
+        }, timeUp);
+    }
+
+    // Klik na lik (udaranje)
+    holes.forEach(hole => {
+        const mole = hole.querySelector('.mole');
+        
+        mole.addEventListener('mousedown', (e) => {
+            if (!isPlaying || !hole.classList.contains('up')) return;
+            
+            const clickedPolIndex = parseInt(mole.dataset.index);
+
+            if (clickedPolIndex === chosenIndex) {
+                playSound('fail');
+                hole.classList.remove('up');
+                endGame(true, `Udario si svog favorita (${politicians[chosenIndex].name})!`);
+            } else {
+                playSound('hit');
+                score += 10;
+                scoreDisplay.textContent = score;
+                hole.classList.remove('up');
+            }
+        });
+    });
+
+    async function fetchScores() {
+        scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>`;
+        try {
+            const res = await fetch('/api/get-scores');
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Nema rezultata još uvijek.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach((item, index) => {
+                html += `
                     <tr>
-                        <th>Igrač / Favorit</th>
-                        <th>Bodovi</th>
+                        <td>${index + 1}. ${item.player_name}</td>
+                        <td style="text-align: right;"><strong>${item.score}</strong></td>
                     </tr>
-                </thead>
-                <tbody id="scores-tbody">
-                    <tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>
-                </tbody>
-            </table>
-            <button id="close-modal-btn">Zatvori</button>
-        </div>
-    </div>
+                `;
+            });
+            scoresTbody.innerHTML = html;
+        } catch (err) {
+            scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#e74c3c;">Greška pri učitavanju.</td></tr>`;
+            console.error(err);
+        }
+    }
 
-    <!-- MODAL ZA UNOS IMENA NAKON KRAJA IGRE -->
-    <div id="save-score-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="modal-gameover-title">KRAJ IGRE</h2>
-            <p id="modal-gameover-reason" style="margin-bottom: 5px;"></p>
-            <p>Osvojeni bodovi: <strong id="modal-final-score">0</strong></p>
-            
-            <label for="player-name-input" style="font-size: 0.9rem; display:block; text-align:left;">Unesi svoje ime:</label>
-            <input type="text" id="player-name-input" placeholder="Tvoje ime..." maxlength="25">
-            
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button id="submit-score-btn" style="margin-top:0;">Sačuvaj</button>
-                <button id="cancel-score-btn" class="secondary-btn" style="margin-top:0;">Preskoči</button>
-            </div>
-        </div>
-    </div>
+    async function saveScoreToServer(playerName, finalScore) {
+        try {
+            const response = await fetch('/api/save-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    player_name: playerName, 
+                    score: finalScore 
+                }),
+            });
+            const data = await response.json();
+            console.log('Uspješno spremljeno:', data);
+        } catch (err) {
+            console.error('Greška pri spremanju:', err);
+        }
+    }
 
-    <!-- EKRAN IGRE -->
-    <div id="game-screen" class="screen hidden">
-        <div class="hud">
-            <div>Bodovi: <span id="score">0</span></div>
-            <div>Vrijeme: <span id="timer">60</span>s</div>
-            <div id="target-indicator">Tvoj: <span id="chosen-name">-</span></div>
-        </div>
+    function endGame(isPenalty, message) {
+        isPlaying = false;
+        clearInterval(gameInterval);
+        clearTimeout(moleTimer);
+        holes.forEach(h => h.classList.remove('up'));
 
-        <div class="grid">
-            <div class="hole" data-index="0"><img class="mole" src="" alt="politicar"></div>
-            <div class="hole" data-index="1"><img class="mole" src="" alt="politicar"></div>
-            <div class="hole" data-index="2"><img class="mole" src="" alt="politicar"></div>
-            <div class="hole" data-index="3"><img class="mole" src="" alt="politicar"></div>
-            <div class="hole" data-index="4"><img class="mole" src="" alt="politicar"></div>
-            <div class="hole" data-index="5"><img class="mole" src="" alt="politicar"></div>
-        </div>
-    </div>
+        // Prikaz modala na kraju igre
+        gameScreen.classList.add('hidden');
+        saveScoreModal.classList.remove('hidden');
 
-    <script src="script.js"></script>
-</body>
-</html>
+        if (isPenalty) {
+            modalGameoverTitle.textContent = "KRAJ - UHVAĆEN U PRELJETU!";
+            modalGameoverTitle.style.color = "#e74c3c";
+        } else {
+            modalGameoverTitle.textContent = "VRIJEME JE ISTEKLO!";
+            modalGameoverTitle.style.color = "#f39c12";
+        }
+
+        // Ažuriranje teksta u tvom modalu
+        modalGameoverReason.textContent = message;
+        modalFinalScore.textContent = score;
+
+        // Fokus na input za unos imena
+        playerNameInput.value = "";
+        playerNameInput.focus();
+    }
+
+    // Dugmići iz tvog modala za kraj igre
+    submitScoreBtn.addEventListener('click', async () => {
+        let name = playerNameInput.value.trim();
+        if (!name) name = "Anonimac";
+        let fullName = `${name} (${politicians[chosenIndex].name})`;
+        
+        await saveScoreToServer(fullName, score);
+        resetToMenu();
+    });
+
+    cancelScoreBtn.addEventListener('click', () => {
+        resetToMenu();
+    });
+
+    function resetToMenu() {
+        saveScoreModal.classList.add('hidden');
+        selectionScreen.classList.remove('hidden');
+    }
+});

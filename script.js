@@ -16,24 +16,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false;
     let lastHole = null;
 
+    // Povezivanje elemenata iz tvog novog HTML-a
     const selectionScreen = document.getElementById('selection-screen');
     const gameScreen = document.getElementById('game-screen');
-    const gameoverScreen = document.getElementById('gameover-screen');
     const startBtn = document.getElementById('start-btn');
-    const restartBtn = document.getElementById('restart-btn');
+    
+    // HUD elementi
     const scoreDisplay = document.getElementById('score');
     const timerDisplay = document.getElementById('timer');
-    const finalScoreDisplay = document.getElementById('final-score');
     const chosenNameDisplay = document.getElementById('chosen-name');
-    const gameoverTitle = document.getElementById('gameover-title');
-    const gameoverReason = document.getElementById('gameover-reason');
     const holes = document.querySelectorAll('.hole');
 
-    // Elementi za rang listu i modal iz tvog HTML-a
+    // Modal i Rang-lista
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const scoresTbody = document.getElementById('scores-tbody');
+
+    // Tvoj novi Modal za kraj igre i unos imena
+    const saveScoreModal = document.getElementById('save-score-modal');
+    const modalGameoverTitle = document.getElementById('modal-gameover-title');
+    const modalGameoverReason = document.getElementById('modal-gameover-reason');
+    const modalFinalScore = document.getElementById('modal-final-score');
+    const playerNameInput = document.getElementById('player-name-input');
+    const submitScoreBtn = document.getElementById('submit-score-btn');
+    const cancelScoreBtn = document.getElementById('cancel-score-btn');
 
     // Web Audio API zvuci
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -64,9 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', resetToMenu);
 
-    // Otvaranje i zatvaranje modala za rang-listu sa početnog ekrana
+    // Otvaranje i zatvaranje modala za rang-listu
     leaderboardBtn.addEventListener('click', () => {
         leaderboardModal.classList.remove('hidden');
         fetchScores();
@@ -84,8 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chosenNameDisplay.textContent = politicians[chosenIndex].name;
         
+        // Prikaz ispravnih ekrana (bez puknutih referenci na stari ekran)
         selectionScreen.classList.add('hidden');
-        gameoverScreen.classList.add('hidden');
+        saveScoreModal.classList.add('hidden');
         gameScreen.classList.remove('hidden');
 
         score = 0;
@@ -94,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = timeLeft;
         isPlaying = true;
 
-        // Pokreni tajmer sekunde
+        // Pokreni tajmer
         gameInterval = setInterval(() => {
             timeLeft--;
             timerDisplay.textContent = timeLeft;
@@ -141,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, timeUp);
     }
 
-    // Klik na lik (udaranje čekićem)
+    // Klik na lik (udaranje)
     holes.forEach(hole => {
         const mole = hole.querySelector('.mole');
         
@@ -151,12 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const clickedPolIndex = parseInt(mole.dataset.index);
 
             if (clickedPolIndex === chosenIndex) {
-                // UDARIO SI SVOG! KRAJ IGRE!
                 playSound('fail');
                 hole.classList.remove('up');
                 endGame(true, `Udario si svog favorita (${politicians[chosenIndex].name})!`);
             } else {
-                // POGODAK
                 playSound('hit');
                 score += 10;
                 scoreDisplay.textContent = score;
@@ -165,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Funkcija za dohvatanje rezultata sa servera (za rang listu)
     async function fetchScores() {
         scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>`;
         try {
@@ -193,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Funkcija za slanje rezultata na serverless API rutu
     async function saveScoreToServer(playerName, finalScore) {
         try {
             const response = await fetch('/api/save-score', {
@@ -207,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }),
             });
             const data = await response.json();
-            console.log('Uspješno spremljeno u bazu:', data);
+            console.log('Uspješno spremljeno:', data);
         } catch (err) {
             console.error('Greška pri spremanju:', err);
         }
@@ -219,31 +222,43 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(moleTimer);
         holes.forEach(h => h.classList.remove('up'));
 
+        // Prikaz modala na kraju igre
         gameScreen.classList.add('hidden');
-        gameoverScreen.classList.remove('hidden');
+        saveScoreModal.classList.remove('hidden');
 
         if (isPenalty) {
-            gameoverTitle.textContent = "KRAJ - UHVAĆEN U PRELJETU!";
-            gameoverTitle.style.color = "#e74c3c";
+            modalGameoverTitle.textContent = "KRAJ - UHVAĆEN U PRELJETU!";
+            modalGameoverTitle.style.color = "#e74c3c";
         } else {
-            gameoverTitle.textContent = "VRIJEME JE ISTEKLO!";
-            gameoverTitle.style.color = "#f39c12";
+            modalGameoverTitle.textContent = "VRIJEME JE ISTEKLO!";
+            modalGameoverTitle.style.color = "#f39c12";
         }
 
-        gameoverReason.textContent = message;
-        finalScoreDisplay.textContent = score;
+        // Ažuriranje teksta u tvom modalu
+        modalGameoverReason.textContent = message;
+        modalFinalScore.textContent = score;
 
-        let playerName = prompt("Igra je završena! Unesi svoje ime za rang listu:", "Igrač");
-        if (!playerName || playerName.trim() === "") {
-            playerName = "Anonimni";
-        }
-
-        let fullName = `${playerName.trim()} (${politicians[chosenIndex].name})`;
-        saveScoreToServer(fullName, score);
+        // Fokus na input za unos imena
+        playerNameInput.value = "";
+        playerNameInput.focus();
     }
 
+    // Dugmići iz tvog modala za kraj igre
+    submitScoreBtn.addEventListener('click', async () => {
+        let name = playerNameInput.value.trim();
+        if (!name) name = "Anonimac";
+        let fullName = `${name} (${politicians[chosenIndex].name})`;
+        
+        await saveScoreToServer(fullName, score);
+        resetToMenu();
+    });
+
+    cancelScoreBtn.addEventListener('click', () => {
+        resetToMenu();
+    });
+
     function resetToMenu() {
-        gameoverScreen.classList.add('hidden');
+        saveScoreModal.classList.add('hidden');
         selectionScreen.classList.remove('hidden');
     }
 });
