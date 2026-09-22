@@ -8,9 +8,30 @@
 </head>
 <body>
 
-    <!-- EKRAN ZA IZBOR -->
-    <div id="selection-screen" class="screen">
-        <h1>UDARI POLITIČARA</h1>
+    <!-- UVODNI / POČETNI EKRAN SA PRAVILIMA -->
+    <div id="welcome-screen" class="screen">
+        <h1>BUDŽETSKE KRTICE</h1>
+        <p class="subtitle">Whack-a-Mole BiH izdanje</p>
+        
+        <div class="rules-box">
+            <h3>Pravila igre:</h3>
+            <ul>
+                <li><strong>Cilj:</strong> Udari što više političara koji iskaču iz rupa za 60 sekundi. Svaki pogodak donosi 10 bodova.</li>
+                <li><strong>Zlatno pravilo:</strong> Na početku birate svog <strong>favorita</strong>.</li>
+                <li><strong>Kraj igre:</strong> Ako slučajno udarite svog izabranog političara – igra je <strong>odmah gotova</strong> i gubite!</li>
+                <li><strong>Rang-lista:</strong> Samo najbolji rezultati koji uđu u Top 100 mogu spremiti svoje ime.</li>
+            </ul>
+        </div>
+
+        <div class="menu-actions">
+            <button id="go-to-selection-btn">IZABERI FAVORITA</button>
+            <button id="welcome-leaderboard-btn" class="secondary-btn">RANG-LISTA</button>
+        </div>
+    </div>
+
+    <!-- EKRAN ZA IZBOR FAVORITA (Početno sakriven) -->
+    <div id="selection-screen" class="screen hidden">
+        <h1>IZBOR FAVORITA</h1>
         <p>Izaberi svog političara s kojim NE SMIJEŠ dobiti udarac:</p>
         
         <div class="politicians-grid">
@@ -43,7 +64,7 @@
 
         <div class="menu-actions">
             <button id="start-btn">ZAPOČNI IGRU</button>
-            <button id="leaderboard-btn" class="secondary-btn">RANG-LISTA</button>
+            <button id="back-to-welcome-btn" class="secondary-btn">NAZAD</button>
         </div>
     </div>
 
@@ -80,7 +101,7 @@
             <p id="modal-gameover-reason" style="margin-bottom: 5px;"></p>
             <p>Osvojeni bodovi: <strong id="modal-final-score">0</strong></p>
             
-            <label for="player-name-input" style="font-size: 0.9rem; display:block; text-align:left;">Unesi svoje ime:</label>
+            <label for="player-name-input" style="font-size: 0.9rem; display:block; text-align:left;">Unesi svoje ime (Top 100):</label>
             <input type="text" id="player-name-input" placeholder="Tvoje ime..." maxlength="25">
             
             <div style="display: flex; gap: 10px; justify-content: center;">

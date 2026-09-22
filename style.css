@@ -28,7 +28,7 @@ body:active {
     justify-content: center;
     height: 100vh;
     width: 100vw;
-    padding: 15px;
+    padding: 20px;
     text-align: center;
     overflow: hidden;
 }
@@ -38,8 +38,8 @@ body:active {
 }
 
 h1 {
-    font-size: 2.3rem;
-    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    margin: 0 0 5px 0;
     color: #f39c12;
     text-shadow: 2px 2px #000;
 }
@@ -47,6 +47,47 @@ h1 {
 p {
     font-size: 1.1rem;
     margin: 0 0 15px 0;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #bdc3c7;
+    margin-bottom: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Stil za uvodnu kutiju sa pravilima */
+.rules-box {
+    background: rgba(44, 62, 80, 0.7);
+    border: 2px solid #34495e;
+    border-radius: 12px;
+    padding: 18px 25px;
+    margin: 10px 0 20px 0;
+    max-width: 500px;
+    width: 90%;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.rules-box h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #f39c12;
+    font-size: 1.2rem;
+}
+
+.rules-box ul {
+    padding-left: 20px;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ecf0f1;
+}
+
+.rules-box li {
+    margin-bottom: 6px;
 }
 
 /* Izbor političara - Veće kartice */
@@ -108,7 +149,7 @@ button {
     cursor: pointer;
     box-shadow: 0 4px #c0392b;
     transition: 0.1s;
-    margin-top: 12px;
+    margin-top: 10px;
 }
 
 button:hover {
@@ -122,9 +163,10 @@ button:active {
 
 .menu-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 5px;
+    flex-wrap: wrap;
 }
 
 .secondary-btn {
@@ -251,6 +293,19 @@ button:active {
 @media (max-height: 700px), (max-width: 550px) {
     h1 {
         font-size: 1.6rem;
+    }
+    .subtitle {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+    .rules-box {
+        padding: 10px 15px;
+        margin: 5px 0 10px 0;
+        font-size: 0.85rem;
+    }
+    .rules-box h3 {
+        font-size: 1rem;
+        margin-bottom: 5px;
     }
     .politician-card {
         width: 90px;

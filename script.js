@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Putanje do karikatura unutar foldera images
     const politicians = [
         { name: "Milorad Dodik", img: "images/dodik.png" },
         { name: "Dragan Čović", img: "images/covic.png" },
@@ -15,11 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let moleTimer;
     let isPlaying = false;
     let lastHole = null;
-    let currentLimit = 10; // Početni limit za rang listu
+    let currentLimit = 10;
 
-    // Povezivanje elemenata iz HTML-a
+    // Ekrani
+    const welcomeScreen = document.getElementById('welcome-screen');
     const selectionScreen = document.getElementById('selection-screen');
     const gameScreen = document.getElementById('game-screen');
+    
+    // Dugmad menija
+    const goToSelectionBtn = document.getElementById('go-to-selection-btn');
+    const welcomeLeaderboardBtn = document.getElementById('welcome-leaderboard-btn');
+    const backToWelcomeBtn = document.getElementById('back-to-welcome-btn');
     const startBtn = document.getElementById('start-btn');
     
     // HUD elementi
@@ -29,16 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const holes = document.querySelectorAll('.hole');
 
     // Modal i Rang-lista
-    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const leaderboardBtn = document.getElementById('leaderboard-btn'); // ako postoji
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const scoresTbody = document.getElementById('scores-tbody');
     
-    // Tab dugmad za rang-listu
     const tab10Btn = document.getElementById('tab-10');
     const tab100Btn = document.getElementById('tab-100');
 
-    // Modal za kraj igre i unos imena
+    // Modal za unos imena
     const saveScoreModal = document.getElementById('save-score-modal');
     const modalGameoverTitle = document.getElementById('modal-gameover-title');
     const modalGameoverReason = document.getElementById('modal-gameover-reason');
@@ -75,10 +79,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    startBtn.addEventListener('click', startGame);
+    // Navigacija kroz menije
+    goToSelectionBtn.addEventListener('click', () => {
+        welcomeScreen.classList.add('hidden');
+        selectionScreen.classList.remove('hidden');
+    });
 
-    // Otvaranje i zatvaranje modala za rang-listu
-    leaderboardBtn.addEventListener('click', () => {
+    if (backToWelcomeBtn) {
+        backToWelcomeBtn.addEventListener('click', () => {
+            selectionScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        });
+    }
+
+    welcomeLeaderboardBtn.addEventListener('click', () => {
         leaderboardModal.classList.remove('hidden');
         fetchScores(currentLimit);
     });
@@ -87,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         leaderboardModal.classList.add('hidden');
     });
 
-    // Event listeneri za tabove Top 10 / Top 100
     if (tab10Btn && tab100Btn) {
         tab10Btn.addEventListener('click', () => {
             currentLimit = 10;
@@ -104,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    startBtn.addEventListener('click', startGame);
+
     function startGame() {
         const radios = document.getElementsByName('chosen');
         for (let r of radios) {
@@ -112,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chosenNameDisplay.textContent = politicians[chosenIndex].name;
         
+        welcomeScreen.classList.add('hidden');
         selectionScreen.classList.add('hidden');
         saveScoreModal.classList.add('hidden');
         gameScreen.classList.remove('hidden');
@@ -122,16 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = timeLeft;
         isPlaying = true;
 
-        // Pokreni tajmer
         gameInterval = setInterval(() => {
             timeLeft--;
             timerDisplay.textContent = timeLeft;
             if (timeLeft <= 0) {
-                endGame(false, "Vrijeme je isteklo!");
+                checkAndEndGame(false, "Vrijeme je isteklo!");
             }
         }, 1000);
 
-        // Pokreni iskakanje likova
         runner();
     }
 
@@ -159,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         hole.classList.add('up');
 
-        let timeUp = Math.random() * 600 + 600; // Vrijeme vani (0.6s - 1.2s)
+        let timeUp = Math.random() * 600 + 600; 
         
         moleTimer = setTimeout(() => {
             hole.classList.remove('up');
@@ -169,11 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, timeUp);
     }
 
-    // Klik na lik (udaranje)
     holes.forEach(hole => {
         const mole = hole.querySelector('.mole');
         
-        mole.addEventListener('mousedown', (e) => {
+        mole.addEventListener('mousedown', () => {
             if (!isPlaying || !hole.classList.contains('up')) return;
             
             const clickedPolIndex = parseInt(mole.dataset.index);
@@ -181,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (clickedPolIndex === chosenIndex) {
                 playSound('fail');
                 hole.classList.remove('up');
-                endGame(true, `Udario si svog favorita (${politicians[chosenIndex].name})!`);
+                checkAndEndGame(true, `Udario si svog favorita (${politicians[chosenIndex].name})!`);
             } else {
                 playSound('hit');
                 score += 10;
@@ -209,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Ograničeni prikaz u skladu s odabranim tabom (Top 10 ili Top 100)
             const limitedData = data.slice(0, limit);
 
             let html = '';
@@ -230,29 +242,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveScoreToServer(playerName, finalScore) {
         try {
-            const response = await fetch('/api/save-score', {
+            await fetch('/api/save-score', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    player_name: playerName, // Sada šalje čisto uneseno ime
+                    player_name: playerName, 
                     score: finalScore 
                 }),
             });
-            const data = await response.json();
-            console.log('Uspješno spremljeno:', data);
         } catch (err) {
             console.error('Greška pri spremanju:', err);
         }
     }
 
-    function endGame(isPenalty, message) {
+    // Provjera Top 100 prije prikazivanja modala za unos imena
+    async function checkAndEndGame(isPenalty, message) {
         isPlaying = false;
         clearInterval(gameInterval);
         clearTimeout(moleTimer);
         holes.forEach(h => h.classList.remove('up'));
 
+        let qualifiesForLeaderboard = false;
+        try {
+            const res = await fetch('/api/get-scores?limit=100');
+            const responseData = await res.json();
+            
+            let data = responseData;
+            if (!Array.isArray(data)) {
+                if (Array.isArray(data.data)) data = data.data;
+                else if (Array.isArray(data.scores)) data = data.scores;
+                else if (Array.isArray(data.results)) data = data.results;
+            }
+
+            if (!Array.isArray(data) || data.length < 100) {
+                qualifiesForLeaderboard = true;
+            } else {
+                const lowestScoreInTop100 = data[data.length - 1].score || 0;
+                if (score > lowestScoreInTop100) {
+                    qualifiesForLeaderboard = true;
+                }
+            }
+        } catch (err) {
+            console.error('Greška pri provjeri rang-liste:', err);
+            qualifiesForLeaderboard = true; // U slučaju problema sa serverom, dozvoli unos da igrači nisu zakinuti
+        }
+
+        // Ako rezultat nije u top 100, preskoči unos imena i vrati na početni ekran
+        if (!qualifiesForLeaderboard) {
+            resetToMenu();
+            return;
+        }
+
+        // Inače prikaži modal za unos imena
         gameScreen.classList.add('hidden');
         saveScoreModal.classList.remove('hidden');
 
@@ -285,6 +328,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetToMenu() {
         saveScoreModal.classList.add('hidden');
-        selectionScreen.classList.remove('hidden');
+        gameScreen.classList.add('hidden');
+        selectionScreen.classList.add('hidden');
+        welcomeScreen.classList.remove('hidden');
     }
 });
