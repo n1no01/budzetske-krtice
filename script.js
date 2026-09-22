@@ -171,31 +171,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function fetchScores() {
-        scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>`;
-        try {
-            const res = await fetch('/api/get-scores');
-            const data = await res.json();
+    scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>`;
+    try {
+        const res = await fetch('/api/get-scores');
+        const responseData = await res.json();
 
-            if (!data || data.length === 0) {
-                scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Nema rezultata još uvijek.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            data.forEach((item, index) => {
-                html += `
-                    <tr>
-                        <td>${index + 1}. ${item.player_name}</td>
-                        <td style="text-align: right;"><strong>${item.score}</strong></td>
-                    </tr>
-                `;
-            });
-            scoresTbody.innerHTML = html;
-        } catch (err) {
-            scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#e74c3c;">Greška pri učitavanju.</td></tr>`;
-            console.error(err);
+        // Podrška za slučaj da API vraća niz direktno ILI objekat sa nizom (npr. { data: [...] } ili { scores: [...] })
+        let data = responseData;
+        if (!Array.isArray(data)) {
+            if (Array.isArray(data.data)) data = data.data;
+            else if (Array.isArray(data.scores)) data = data.scores;
+            else if (Array.isArray(data.results)) data = data.results;
         }
+
+        if (!Array.isArray(data) || data.length === 0) {
+            scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Nema rezultata još uvijek.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach((item, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}. ${item.player_name || item.name || 'Anonimac'}</td>
+                    <td style="text-align: right;"><strong>${item.score || 0}</strong></td>
+                </tr>
+            `;
+        });
+        scoresTbody.innerHTML = html;
+    } catch (err) {
+        scoresTbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#e74c3c;">Greška pri učitavanju.</td></tr>`;
+        console.error(err);
     }
+}
 
     async function saveScoreToServer(playerName, finalScore) {
         try {
