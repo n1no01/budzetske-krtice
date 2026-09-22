@@ -28,11 +28,17 @@ const gameoverTitle = document.getElementById('gameover-title');
 const gameoverReason = document.getElementById('gameover-reason');
 const holes = document.querySelectorAll('.hole');
 
-// Elementi za rang listu i modal iz tvog HTML-a
+// Elementi za rang listu i modal
 const leaderboardBtn = document.getElementById('leaderboard-btn');
 const leaderboardModal = document.getElementById('leaderboard-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const scoresTbody = document.getElementById('scores-tbody');
+
+// Novi modal za unos imena umjesto prompt-a
+const saveScoreModal = document.getElementById('save-score-modal');
+const playerNameInput = document.getElementById('player-name-input');
+const submitScoreBtn = document.getElementById('submit-score-btn');
+const cancelScoreBtn = document.getElementById('cancel-score-btn');
 
 // Web Audio API zvuci
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -85,6 +91,7 @@ function startGame() {
     
     selectionScreen.classList.add('hidden');
     gameoverScreen.classList.add('hidden');
+    if (saveScoreModal) saveScoreModal.classList.add('hidden');
     gameScreen.classList.remove('hidden');
 
     score = 0;
@@ -232,17 +239,40 @@ function endGame(isPenalty, message) {
     gameoverReason.textContent = message;
     finalScoreDisplay.textContent = score;
 
-    // Pitaj igrača za ime preko ugrađenog prompta (ili automatski upiši uz favorita)
-    let playerName = prompt("Igra je završena! Unesi svoje ime za rang listu:", "Igrač (" + politicians[chosenIndex].name + ")");
-    if (!playerName || playerName.trim() === "") {
-        playerName = "Anonimni (" + politicians[chosenIndex].name + ")";
+    // Umjesto starog browser prompta, otvaramo pravi mali HTML modal za unos imena ako postoji, ili automatski spremamo
+    if (saveScoreModal) {
+        saveScoreModal.classList.remove('hidden');
+        if (playerNameInput) {
+            playerNameInput.value = "";
+            playerNameInput.focus();
+        }
+    } else {
+        // Fallback ako slučajno modal nije dodat u HTML
+        let playerName = "Igrač (" + politicians[chosenIndex].name + ")";
+        saveScoreToServer(playerName, score);
     }
+}
 
-    // Slanje u bazu
-    saveScoreToServer(playerName.trim(), score);
+// Dugmići unutar novog modala za upis imena
+if (submitScoreBtn) {
+    submitScoreBtn.onclick = async () => {
+        let name = playerNameInput ? playerNameInput.value.trim() : "";
+        if (!name) name = "Anonimac";
+        let fullName = `${name} (${politicians[chosenIndex].name})`;
+        
+        await saveScoreToServer(fullName, score);
+        if (saveScoreModal) saveScoreModal.classList.add('hidden');
+    };
+}
+
+if (cancelScoreBtn) {
+    cancelScoreBtn.onclick = () => {
+        if (saveScoreModal) saveScoreModal.classList.add('hidden');
+    };
 }
 
 function resetToMenu() {
     gameoverScreen.classList.add('hidden');
+    if (saveScoreModal) saveScoreModal.classList.add('hidden');
     selectionScreen.classList.remove('hidden');
 }

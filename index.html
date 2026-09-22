@@ -66,7 +66,24 @@
         </div>
     </div>
 
-   
+    <!-- MODAL ZA UNOS IMENA NAKON KRAJA IGRE -->
+    <div id="save-score-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-gameover-title">KRAJ IGRE</h2>
+            <p id="modal-gameover-reason" style="margin-bottom: 5px;"></p>
+            <p>Osvojeni bodovi: <strong id="modal-final-score">0</strong></p>
+            
+            <label for="player-name-input" style="font-size: 0.9rem; display:block; text-align:left;">Unesi svoje ime:</label>
+            <input type="text" id="player-name-input" placeholder="Tvoje ime..." maxlength="25">
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="submit-score-btn" style="margin-top:0;">Sačuvaj</button>
+                <button id="cancel-score-btn" class="secondary-btn" style="margin-top:0;">Preskoči</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN IGRE -->
     <div id="game-screen" class="screen hidden">
         <div class="hud">
             <div>Bodovi: <span id="score">0</span></div>
@@ -75,7 +92,6 @@
         </div>
 
         <div class="grid">
-            <!-- 6 rupa za iskakanje -->
             <div class="hole" data-index="0"><img class="mole" src="" alt="politicar"></div>
             <div class="hole" data-index="1"><img class="mole" src="" alt="politicar"></div>
             <div class="hole" data-index="2"><img class="mole" src="" alt="politicar"></div>
@@ -83,14 +99,6 @@
             <div class="hole" data-index="4"><img class="mole" src="" alt="politicar"></div>
             <div class="hole" data-index="5"><img class="mole" src="" alt="politicar"></div>
         </div>
-    </div>
-
-    <!-- EKRAN KRAJA IGRE -->
-    <div id="gameover-screen" class="screen hidden">
-        <h1 id="gameover-title">KRAJ IGRE</h1>
-        <p id="gameover-reason"></p>
-        <p>Osvojeni bodovi: <span id="final-score">0</span></p>
-        <button id="restart-btn">IGRAJ PONOVO</button>
     </div>
 
     <script src="script.js"></script>
