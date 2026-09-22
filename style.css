@@ -1,0 +1,276 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Onemogućava nepotreban skrol */
+    background: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    user-select: none;
+    box-sizing: border-box;
+    /* Custom čekić kursor samo za desktop */
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"><text y="20" font-size="22">🔨</text></svg>') 0 0, auto;
+}
+
+body:active {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"><text y="20" font-size="22">💥</text></svg>') 0 0, auto;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 15px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1 {
+    font-size: 2.3rem;
+    margin: 0 0 10px 0;
+    color: #f39c12;
+    text-shadow: 2px 2px #000;
+}
+
+p {
+    font-size: 1.1rem;
+    margin: 0 0 15px 0;
+}
+
+/* Izbor političara - Veće kartice */
+.politicians-grid {
+    display: flex;
+    gap: 15px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 700px;
+}
+
+.politician-card {
+    background: #2c3e50;
+    border: 3px solid #34495e;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 120px;
+}
+
+.politician-card:hover {
+    border-color: #f39c12;
+    transform: translateY(-3px);
+}
+
+.politician-card input {
+    display: none;
+}
+
+.politician-card input:checked + img {
+    border: 3px solid #f39c12;
+}
+
+.politician-card img {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+}
+
+.politician-card span {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px #c0392b;
+    transition: 0.1s;
+    margin-top: 12px;
+}
+
+button:hover {
+    background: #c0392b;
+}
+
+button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 #c0392b;
+}
+
+.menu-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.secondary-btn {
+    background: #34495e;
+    box-shadow: 0 3px #2c3e50;
+}
+.secondary-btn:hover {
+    background: #2c3e50;
+}
+
+/* Modal za tabelu */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: #2c3e50;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 2px solid #f39c12;
+}
+
+.modal-content h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #f39c12;
+}
+
+#scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+#scores-table th, #scores-table td {
+    padding: 8px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+}
+
+#scores-table th {
+    color: #f39c12;
+}
+
+/* HUD (Bodovi i Vrijeme) */
+.hud {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 550px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 18px;
+    background: #2c3e50;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+#target-indicator span {
+    color: #e74c3c;
+}
+
+/* Mreža rupa - Veće rupe za igru */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 160px);
+    grid-gap: 20px;
+    justify-content: center;
+}
+
+.hole {
+    width: 160px;
+    height: 160px;
+    background: #2c2c2c;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 5px solid #444;
+    box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
+}
+
+.mole {
+    position: absolute;
+    top: 160px;
+    left: 0;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: top 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+/* Kada je rupa aktivna */
+.hole.up .mole {
+    top: 0;
+}
+
+/* Prilagođavanje samo za baš male ekrane telefona da ne pobjegne sa ekrana */
+@media (max-height: 700px), (max-width: 550px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+    .politician-card {
+        width: 90px;
+        padding: 6px;
+    }
+    .politician-card img {
+        width: 60px;
+        height: 60px;
+    }
+    .politician-card span {
+        font-size: 0.75rem;
+    }
+    .grid {
+        grid-template-columns: repeat(3, 120px);
+        grid-gap: 12px;
+    }
+    .hole {
+        width: 120px;
+        height: 120px;
+        border-width: 4px;
+    }
+    .mole {
+        top: 120px;
+        width: 120px;
+        height: 120px;
+    }
+    .hud {
+        max-width: 400px;
+        font-size: 1.1rem;
+        padding: 8px;
+    }
+}

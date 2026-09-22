@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udari Političara - Whack-a-Mole BiH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- EKRAN ZA IZBOR -->
+    <div id="selection-screen" class="screen">
+        <h1>UDARI POLITIČARA</h1>
+        <p>Izaberi svog političara s kojim NE SMIJEŠ dobiti udarac:</p>
+        
+        <div class="politicians-grid">
+            <label class="politician-card">
+                <input type="radio" name="chosen" value="0" checked>
+                <img src="images/dodik.png" alt="Dodik">
+                <span>Milorad Dodik</span>
+            </label>
+            <label class="politician-card">
+                <input type="radio" name="chosen" value="1">
+                <img src="images/covic.png" alt="Čović">
+                <span>Dragan Čović</span>
+            </label>
+            <label class="politician-card">
+                <input type="radio" name="chosen" value="2">
+                <img src="images/bakir.png" alt="Bakir">
+                <span>Bakir Izetbegović</span>
+            </label>
+            <label class="politician-card">
+                <input type="radio" name="chosen" value="3">
+                <img src="images/konakovic.png" alt="Konaković">
+                <span>Elmedin Konaković</span>
+            </label>
+            <label class="politician-card">
+                <input type="radio" name="chosen" value="4">
+                <img src="images/niksic.png" alt="Nikšić">
+                <span>Nermin Nikšić</span>
+            </label>
+        </div>
+
+        <div class="menu-actions">
+            <button id="start-btn">ZAPOČNI IGRU</button>
+            <button id="leaderboard-btn" class="secondary-btn">RANG-LISTA</button>
+        </div>
+    </div>
+
+    <!-- MODAL ZA RANG-LISTU -->
+    <div id="leaderboard-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Najbolji rezultati</h2>
+            <table id="scores-table">
+                <thead>
+                    <tr>
+                        <th>Igrač / Favorit</th>
+                        <th>Bodovi</th>
+                    </tr>
+                </thead>
+                <tbody id="scores-tbody">
+                    <tr><td colspan="2" style="text-align:center;">Učitavanje...</td></tr>
+                </tbody>
+            </table>
+            <button id="close-modal-btn">Zatvori</button>
+        </div>
+    </div>
+
+    <!-- EKRAN IGRE -->
+    <div id="game-screen" class="screen hidden">
+        <div class="hud">
+            <div>Bodovi: <span id="score">0</span></div>
+            <div>Vrijeme: <span id="timer">60</span>s</div>
+            <div id="target-indicator">Tvoj: <span id="chosen-name">-</span></div>
+        </div>
+
+        <div class="grid">
+            <!-- 6 rupa za iskakanje -->
+            <div class="hole" data-index="0"><img class="mole" src="" alt="politicar"></div>
+            <div class="hole" data-index="1"><img class="mole" src="" alt="politicar"></div>
+            <div class="hole" data-index="2"><img class="mole" src="" alt="politicar"></div>
+            <div class="hole" data-index="3"><img class="mole" src="" alt="politicar"></div>
+            <div class="hole" data-index="4"><img class="mole" src="" alt="politicar"></div>
+            <div class="hole" data-index="5"><img class="mole" src="" alt="politicar"></div>
+        </div>
+    </div>
+
+    <!-- EKRAN KRAJA IGRE -->
+    <div id="gameover-screen" class="screen hidden">
+        <h1 id="gameover-title">KRAJ IGRE</h1>
+        <p id="gameover-reason"></p>
+        <p>Osvojeni bodovi: <span id="final-score">0</span></p>
+        <button id="restart-btn">IGRAJ PONOVO</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
