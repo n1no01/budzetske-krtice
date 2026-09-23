@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const politicians = [
-        { name: "Milorad Dodik", img: "images/dodik.png", sound: "audio/dodik.mp3" },
-        { name: "Dragan Čović", img: "images/covic.png", sound: "audio/covic.mp3" },
-        { name: "Bakir Izetbegović", img: "images/bakir.png", sound: "audio/bakir.mp3" },
-        { name: "Elmedin Konaković", img: "images/konakovic.png", sound: "audio/konakovic.mp3" },
-        { name: "Nermin Nikšić", img: "images/niksic.png", sound: "audio/niksic.mp3" }
+        { name: "Mile", img: "images/dodik.png", sound: "audio/dodik.mp3" },
+        { name: "Čova", img: "images/covic.png", sound: "audio/covic.mp3" },
+        { name: "Bake", img: "images/bakir.png", sound: "audio/bakir.mp3" },
+        { name: "Dino", img: "images/konakovic.png", sound: "audio/konakovic.mp3" },
+        { name: "Nera", img: "images/niksic.png", sound: "audio/niksic.mp3" }
         // { name: "Semir Efendić", img: "images/efendic.png", sound: "audio/efendic.mp3" }
     ];
 
@@ -194,20 +194,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         hole.classList.add('up');
 
-        // Progresivna težina: ubrzanje kako vrijeme ističe
-        let speedFactor = timeLeft < 20 ? 0.5 : (timeLeft < 40 ? 0.75 : 1.0);
-        let timeUp = (Math.random() * 300 + 250) * speedFactor; 
+        // Vraćeno na normalnu, ugodnu brzinu (lik stoji 700ms - 1300ms)
+        //let timeUp = Math.random() * 600 + 700; 
+        let timeUp = 600;
         
         moleTimer = setTimeout(() => {
             hole.classList.remove('up');
             if (isPlaying) {
-                let nextDelay = (Math.random() * 200 + 100) * speedFactor;
+                // Pauza između iskakanja (300ms - 700ms)
+                //let nextDelay = Math.random() * 400 + 300;
+                let nextDelay = 400;
                 setTimeout(runner, nextDelay);
             }
         }, timeUp);
     }
 
-    // Registracija klikova isključivo na same karikature (nema kazne za promašaj rupa)
     holes.forEach(hole => {
         const mole = hole.querySelector('.mole');
         

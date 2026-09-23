@@ -169,6 +169,11 @@ button:active {
     flex-wrap: wrap;
 }
 
+.menu-actions button {
+    flex: 1; /* Omogućava da oba dugmeta ravnomjerno podijele prostor */
+    min-width: 160px; /* Minimalna širina da tekst lijepo stane */
+}
+
 .secondary-btn {
     background: #34495e;
     box-shadow: 0 3px #2c3e50;
