@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Udari Političara - Whack-a-Mole BiH</title>
+    <title>Budžetske Krtice - Whack-a-Mole BiH</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,39 +27,49 @@
             <button id="go-to-selection-btn">IZABERI FAVORITA</button>
             <button id="welcome-leaderboard-btn" class="secondary-btn">RANG-LISTA</button>
         </div>
+
+        <!-- Šaljiva napomena / disclaimer -->
+        <div class="disclaimer-text" style="font-size: 0.85rem; color: #95a5a6; margin-top: 18px; max-width: 450px; font-style: italic;">
+            * Napomena: Igra je isključivo satiričnog karaktera i nema nikakvu zlu namjeru. Svaka sličnost sa stvarnim političarima je... sasvim namjerna!
+        </div>
     </div>
 
     <!-- EKRAN ZA IZBOR FAVORITA (Početno sakriven) -->
     <div id="selection-screen" class="screen hidden">
         <h1>IZBOR FAVORITA</h1>
-        <p>Izaberi svog političara s kojim NE SMIJEŠ dobiti udarac:</p>
+        <p>Izaberi svog političara</p>
         
         <div class="politicians-grid">
             <label class="politician-card">
                 <input type="radio" name="chosen" value="0" checked>
                 <img src="images/dodik.png" alt="Dodik">
-                <span>Milorad Dodik</span>
+                <span>Mile</span>
             </label>
             <label class="politician-card">
                 <input type="radio" name="chosen" value="1">
                 <img src="images/covic.png" alt="Čović">
-                <span>Dragan Čović</span>
+                <span>Čova</span>
             </label>
             <label class="politician-card">
                 <input type="radio" name="chosen" value="2">
                 <img src="images/bakir.png" alt="Bakir">
-                <span>Bakir Izetbegović</span>
+                <span>Bake</span>
             </label>
             <label class="politician-card">
                 <input type="radio" name="chosen" value="3">
                 <img src="images/konakovic.png" alt="Konaković">
-                <span>Elmedin Konaković</span>
+                <span>Dino</span>
             </label>
             <label class="politician-card">
                 <input type="radio" name="chosen" value="4">
                 <img src="images/niksic.png" alt="Nikšić">
-                <span>Nermin Nikšić</span>
+                <span>Nera</span>
             </label>
+            <!-- <label class="politician-card">
+                <input type="radio" name="chosen" value="5">
+                <img src="images/efendic.png" alt="Efendić">
+                <span>Sema</span>
+            </label> -->
         </div>
 
         <div class="menu-actions">
@@ -102,7 +112,7 @@
             <p>Osvojeni bodovi: <strong id="modal-final-score">0</strong></p>
             
             <label for="player-name-input" style="font-size: 0.9rem; display:block; text-align:left;">Unesi svoje ime (Top 100):</label>
-            <input type="text" id="player-name-input" placeholder="Tvoje ime..." maxlength="25">
+            <input type="text" id="player-name-input" placeholder="Tvoje ime..." maxlength="20">
             
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button id="submit-score-btn" style="margin-top:0;">Sačuvaj</button>

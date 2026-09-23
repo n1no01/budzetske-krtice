@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const politicians = [
-        { name: "Milorad Dodik", img: "images/dodik.png" },
-        { name: "Dragan Čović", img: "images/covic.png" },
-        { name: "Bakir Izetbegović", img: "images/bakir.png" },
-        { name: "Elmedin Konaković", img: "images/konakovic.png" },
-        { name: "Nermin Nikšić", img: "images/niksic.png" }
+        { name: "Milorad Dodik", img: "images/dodik.png", sound: "audio/dodik.mp3" },
+        { name: "Dragan Čović", img: "images/covic.png", sound: "audio/covic.mp3" },
+        { name: "Bakir Izetbegović", img: "images/bakir.png", sound: "audio/bakir.mp3" },
+        { name: "Elmedin Konaković", img: "images/konakovic.png", sound: "audio/konakovic.mp3" },
+        { name: "Nermin Nikšić", img: "images/niksic.png", sound: "audio/niksic.mp3" }
+        // { name: "Semir Efendić", img: "images/efendic.png", sound: "audio/efendic.mp3" }
     ];
 
     let chosenIndex = 0;
@@ -34,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const holes = document.querySelectorAll('.hole');
 
     // Modal i Rang-lista
-    const leaderboardBtn = document.getElementById('leaderboard-btn'); // ako postoji
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const scoresTbody = document.getElementById('scores-tbody');
@@ -77,6 +77,24 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start();
             osc.stop(audioCtx.currentTime + 0.4);
         }
+    }
+
+    function playPoliticianSound(soundPath, onEndedCallback) {
+        if (!soundPath) {
+            if (onEndedCallback) onEndedCallback();
+            return;
+        }
+        const audio = new Audio(soundPath);
+        audio.volume = 0.9;
+
+        audio.onended = () => {
+            if (onEndedCallback) onEndedCallback();
+        };
+
+        audio.play().catch(err => {
+            console.log("Pretraživač je blokirao automatsku reprodukciju zvuka:", err);
+            if (onEndedCallback) onEndedCallback();
+        });
     }
 
     // Navigacija kroz menije
@@ -136,17 +154,20 @@ document.addEventListener('DOMContentLoaded', () => {
         timeLeft = 60;
         scoreDisplay.textContent = score;
         timerDisplay.textContent = timeLeft;
-        isPlaying = true;
 
-        gameInterval = setInterval(() => {
-            timeLeft--;
-            timerDisplay.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                checkAndEndGame(false, "Vrijeme je isteklo!");
-            }
-        }, 1000);
+        playPoliticianSound(politicians[chosenIndex].sound, () => {
+            isPlaying = true;
 
-        runner();
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    checkAndEndGame(false, "Vrijeme je isteklo!");
+                }
+            }, 1000);
+
+            runner();
+        });
     }
 
     function randomHole() {
@@ -173,20 +194,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         hole.classList.add('up');
 
-        let timeUp = Math.random() * 600 + 600; 
+        // Progresivna težina: ubrzanje kako vrijeme ističe
+        let speedFactor = timeLeft < 20 ? 0.5 : (timeLeft < 40 ? 0.75 : 1.0);
+        let timeUp = (Math.random() * 300 + 250) * speedFactor; 
         
         moleTimer = setTimeout(() => {
             hole.classList.remove('up');
             if (isPlaying) {
-                setTimeout(runner, Math.random() * 400 + 200);
+                let nextDelay = (Math.random() * 200 + 100) * speedFactor;
+                setTimeout(runner, nextDelay);
             }
         }, timeUp);
     }
 
+    // Registracija klikova isključivo na same karikature (nema kazne za promašaj rupa)
     holes.forEach(hole => {
         const mole = hole.querySelector('.mole');
         
-        mole.addEventListener('mousedown', () => {
+        mole.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
             if (!isPlaying || !hole.classList.contains('up')) return;
             
             const clickedPolIndex = parseInt(mole.dataset.index);
@@ -257,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Provjera Top 100 prije prikazivanja modala za unos imena
     async function checkAndEndGame(isPenalty, message) {
         isPlaying = false;
         clearInterval(gameInterval);
@@ -286,21 +311,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error('Greška pri provjeri rang-liste:', err);
-            qualifiesForLeaderboard = true; // U slučaju problema sa serverom, dozvoli unos da igrači nisu zakinuti
+            qualifiesForLeaderboard = true; 
         }
 
-        // Ako rezultat nije u top 100, preskoči unos imena i vrati na početni ekran
         if (!qualifiesForLeaderboard) {
             resetToMenu();
             return;
         }
 
-        // Inače prikaži modal za unos imena
         gameScreen.classList.add('hidden');
         saveScoreModal.classList.remove('hidden');
 
         if (isPenalty) {
-            modalGameoverTitle.textContent = "KRAJ - UHVAĆEN U PRELJETU!";
+            modalGameoverTitle.textContent = "OVO JE IZDAJA!";
             modalGameoverTitle.style.color = "#e74c3c";
         } else {
             modalGameoverTitle.textContent = "VRIJEME JE ISTEKLO!";
@@ -317,6 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
     submitScoreBtn.addEventListener('click', async () => {
         let name = playerNameInput.value.trim();
         if (!name) name = "Anonimac";
+
+        if (name.length > 20) {
+            name = name.substring(0, 20);
+        }
         
         await saveScoreToServer(name, score);
         resetToMenu();
