@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Čova", img: "images/covic.png", sound: "audio/covic.mp3" },
         { name: "Bake", img: "images/bakir.png", sound: "audio/bakir.mp3" },
         { name: "Dino", img: "images/konakovic.png", sound: "audio/konakovic.mp3" },
-        { name: "Nera", img: "images/niksic.png", sound: "audio/niksic.mp3" }
-        // { name: "Semir Efendić", img: "images/efendic.png", sound: "audio/efendic.mp3" }
+        { name: "Nera", img: "images/niksic.png", sound: "audio/niksic.mp3" },
+        { name: "Sema", img: "images/efendic.png", sound: "audio/efendic.mp3" },
+        { name: "Vukan", img: "images/vukanovic.png", sound: "audio/vukanovic.mp3" }
+        // { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" }
     ];
 
     let chosenIndex = 0;
