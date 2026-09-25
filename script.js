@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Nera", img: "images/niksic.png", sound: "audio/niksic.mp3" },
         { name: "Sema", img: "images/efendic.png", sound: "audio/efendic.mp3" },
         { name: "Vukan", img: "images/vukanovic.png", sound: "audio/vukanovic.mp3" },
-        { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" }
+        { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" },
+        { name: "Komšić", img: "images/komsic.png", sound: "audio/komsic.mp3" }
     ];
 
     let chosenIndex = 0;
