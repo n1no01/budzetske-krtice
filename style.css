@@ -230,8 +230,8 @@ button:active {
     border-radius: 10px;
     width: 90%;
     max-width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: 90vh;
+    overflow: hidden;
     border: 2px solid #f39c12;
     text-align: center;
 }
@@ -253,11 +253,18 @@ button:active {
 }
 
 .leaderboard-table-wrapper {
-    max-height: 400px;
+    max-height: 45vh;
     overflow-y: auto;
     overflow-x: hidden;
     margin-bottom: 15px;
     border-radius: 6px;
+    /* Sakriva scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.leaderboard-table-wrapper::-webkit-scrollbar {
+    display: none;
 }
 
 #scores-table {
