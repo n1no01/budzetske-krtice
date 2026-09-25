@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Dino", img: "images/konakovic.png", sound: "audio/konakovic.mp3" },
         { name: "Nera", img: "images/niksic.png", sound: "audio/niksic.mp3" },
         { name: "Sema", img: "images/efendic.png", sound: "audio/efendic.mp3" },
-        { name: "Vukan", img: "images/vukanovic.png", sound: "audio/vukanovic.mp3" }
-        // { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" }
+        { name: "Vukan", img: "images/vukanovic.png", sound: "audio/vukanovic.mp3" },
+        { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" }
     ];
 
     let chosenIndex = 0;
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (clickedPolIndex === chosenIndex) {
                 playSound('fail');
                 hole.classList.remove('up');
-                checkAndEndGame(true, `Udario si svog favorita (${politicians[chosenIndex].name})!`);
+                checkAndEndGame(true, `Udario si svog favorita!`);
             } else {
                 playSound('hit');
                 score += 10;

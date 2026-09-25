@@ -57,7 +57,6 @@ p {
     letter-spacing: 1px;
 }
 
-/* Stil za uvodnu kutiju sa pravilima */
 .rules-box {
     background: rgba(44, 62, 80, 0.7);
     border: 2px solid #34495e;
@@ -90,7 +89,6 @@ p {
     margin-bottom: 6px;
 }
 
-/* Izbor političara - Veće kartice */
 .politicians-grid {
     display: flex;
     gap: 15px;
@@ -168,6 +166,36 @@ button:active {
     margin-top: 5px;
     flex-wrap: wrap;
 }
+
+ /* Profesionalni stil za gornji desni APK badge */
+        .apk-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(39, 174, 96, 0.15);
+            color: #2ecc71;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+        .apk-badge:hover {
+            background: rgba(39, 174, 96, 0.25);
+            border-color: rgba(46, 204, 113, 0.5);
+            transform: translateY(-1px);
+        }
+        .apk-badge svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
 
 .menu-actions button {
     flex: 1; /* Omogućava da oba dugmeta ravnomjerno podijele prostor */
