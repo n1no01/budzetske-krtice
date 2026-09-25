@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Sema", img: "images/efendic.png", sound: "audio/efendic.mp3" },
         { name: "Vukan", img: "images/vukanovic.png", sound: "audio/vukanovic.mp3" },
         { name: "Fahro", img: "images/radoncic.png", sound: "audio/radoncic.mp3" },
-        { name: "Komšić", img: "images/komsic.png", sound: "audio/komsic.mp3" }
+        { name: "Komšić", img: "images/komsic.png", sound: "audio/komsic.mp3" },
+        { name: "Isak", img: "images/isak.png", sound: "audio/isak.mp3" }
     ];
 
     let chosenIndex = 0;
@@ -182,7 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function randomPolitician() {
-        return Math.floor(Math.random() * politicians.length);
+        const selectedChance = 25; // 25% šansa za izabranog
+
+        if (Math.random() < selectedChance / 100) {
+            return chosenIndex;
+        }
+
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * politicians.length);
+        } while (randomIndex === chosenIndex);
+
+        return randomIndex;
     }
 
     function runner() {
