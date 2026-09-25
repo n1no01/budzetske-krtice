@@ -252,14 +252,22 @@ button:active {
     text-align: center;
 }
 
+.leaderboard-table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+
 #scores-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 15px;
     font-size: 0.9rem;
 }
 
-#scores-table th, #scores-table td {
+#scores-table th,
+#scores-table td {
     padding: 8px;
     border-bottom: 1px solid #444;
     text-align: left;
@@ -267,6 +275,10 @@ button:active {
 
 #scores-table th {
     color: #f39c12;
+    background: #2c3e50;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 /* HUD (Bodovi i Vrijeme) */
